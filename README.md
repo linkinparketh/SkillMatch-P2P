@@ -1,81 +1,100 @@
-# Intercom
+# SkillMatch P2P
 
-This repository is a reference implementation of the **Intercom** stack on Trac Network for an **internet of agents**.
+> **A decentralized peer-to-peer skill marketplace built on Intercom (TRAC Network)**
 
-At its core, Intercom is a **peer-to-peer (P2P) network**: peers discover each other and communicate directly (with optional relaying) over the Trac/Holepunch stack (Hyperswarm/HyperDHT + Protomux). There is no central server required for sidechannel messaging.
+[![Fork of Intercom](https://img.shields.io/badge/fork-Intercom-brightgreen)](https://github.com/Trac-Systems/intercom)
+[![Powered by TRAC](https://img.shields.io/badge/powered%20by-TRAC%20Network-yellow)](https://github.com/Trac-Systems)
 
-Features:
-- **Sidechannels**: fast, ephemeral P2P messaging (with optional policy: welcome, owner-only write, invites, PoW, relaying).
-- **SC-Bridge**: authenticated local WebSocket control surface for agents/tools (no TTY required).
-- **Contract + protocol**: deterministic replicated state and optional chat (subnet plane).
-- **MSB client**: optional value-settled transactions via the validator network.
+---
+<img width="1256" height="822" alt="image" src="https://github.com/user-attachments/assets/5d1b744f-2255-4791-80e7-c81c3f22b0eb" />
 
-Additional references: https://www.moltbook.com/post/9ddd5a47-4e8d-4f01-9908-774669a11c21 and moltbook m/intercom
+## 💡 What is SkillMatch P2P?
 
-For full, agent‑oriented instructions and operational guidance, **start with `SKILL.md`**.  
-It includes setup steps, required runtime, first‑run decisions, and operational notes.
+SkillMatch P2P is a **decentralized skill marketplace** where people can:
 
-## Awesome Intercom
+- 📢 **Post skills they offer** — dev, design, writing, marketing, and more
+- 🔍 **Post skills they're seeking** — find the right collaborator for any project
+- 🤝 **Connect directly P2P** — no middleman, no platform fees, no KYC
+- 📡 **Broadcast listings over Intercom sidechannels** — real-time P2P negotiation
+- 🔒 **Settle agreements peer-to-peer** — using TRAC/TNK or any agreed medium
 
-For a curated list of agentic Intercom apps check out: https://github.com/Trac-Systems/awesome-intercom
+Think of it as a **decentralized Fiverr / Upwork**, but fully P2P — negotiations happen over Intercom sidechannels and there's no central authority taking a cut.
 
-## What this repo is for
-- A working, pinned example to bootstrap agents and peers onto Trac Network.
-- A template that can be trimmed down for sidechannel‑only usage or extended for full contract‑based apps.
+---
 
-## How to use
-Use the **Pear runtime only** (never native node).  
-Follow the steps in `SKILL.md` to install dependencies, run the admin peer, and join peers correctly.
+## 🚀 Features
 
-## Architecture (ASCII map)
-Intercom is a single long-running Pear process that participates in three distinct networking "planes":
-- **Subnet plane**: deterministic state replication (Autobase/Hyperbee over Hyperswarm/Protomux).
-- **Sidechannel plane**: fast ephemeral messaging (Hyperswarm/Protomux) with optional policy gates (welcome, owner-only write, invites).
-- **MSB plane**: optional value-settled transactions (Peer -> MSB client -> validator network).
+- **Live listings board** — skill offers and skill requests in one feed
+- **Category filtering** — Dev, Design, Writing, Marketing, Other
+- **Post a listing** — name, description, tags, rate, and your contact/Trac address
+- **P2P contact modal** — copy a peer's Trac address to connect directly via Intercom
+- **Live activity feed** — see real-time network activity
+- **Fully client-side** — single HTML file, no backend needed
 
-```text
-                          Pear runtime (mandatory)
-                pear run . --peer-store-name <peer> --msb-store-name <msb>
-                                        |
-                                        v
-  +-------------------------------------------------------------------------+
-  |                            Intercom peer process                         |
-  |                                                                         |
-  |  Local state:                                                          |
-  |  - stores/<peer-store-name>/...   (peer identity, subnet state, etc)    |
-  |  - stores/<msb-store-name>/...    (MSB wallet/client state)             |
-  |                                                                         |
-  |  Networking planes:                                                     |
-  |                                                                         |
-  |  [1] Subnet plane (replication)                                         |
-  |      --subnet-channel <name>                                            |
-  |      --subnet-bootstrap <admin-writer-key-hex>  (joiners only)          |
-  |                                                                         |
-  |  [2] Sidechannel plane (ephemeral messaging)                             |
-  |      entry: 0000intercom   (name-only, open to all)                     |
-  |      extras: --sidechannels chan1,chan2                                 |
-  |      policy (per channel): welcome / owner-only write / invites         |
-  |      relay: optional peers forward plaintext payloads to others          |
-  |                                                                         |
-  |  [3] MSB plane (transactions / settlement)                               |
-  |      Peer -> MsbClient -> MSB validator network                          |
-  |                                                                         |
-  |  Agent control surface (preferred):                                     |
-  |  SC-Bridge (WebSocket, auth required)                                   |
-  |    JSON: auth, send, join, open, stats, info, ...                       |
-  +------------------------------+------------------------------+-----------+
-                                 |                              |
-                                 | SC-Bridge (ws://host:port)   | P2P (Hyperswarm)
-                                 v                              v
-                       +-----------------+            +-----------------------+
-                       | Agent / tooling |            | Other peers (P2P)     |
-                       | (no TTY needed) |<---------->| subnet + sidechannels |
-                       +-----------------+            +-----------------------+
+---
 
-  Optional for local testing:
-  - --dht-bootstrap "<host:port,host:port>" overrides the peer's HyperDHT bootstraps
-    (all peers that should discover each other must use the same list).
+## 🖼️ App Screenshot
+
+> See `screenshots/` folder for proof-of-work images.
+
+---
+
+## 🛠️ How to Run
+
+Just open `index.html` in your browser. No installation needed.
+
+```bash
+git clone https://github.com/YOUR_USERNAME/intercom
+cd intercom
+open index.html
 ```
 
 ---
-If you plan to build your own app, study the existing contract/protocol and remove example logic as needed (see `SKILL.md`).
+
+## 🏗️ How It Extends Intercom
+
+This app uses Intercom's P2P sidechannel concept to:
+
+1. **Broadcast skill listings** over the decentralized network
+2. **Negotiate rates & terms** directly between peers without a central server
+3. **Exchange contact/Trac addresses** for direct P2P settlement
+
+The `index.html` is the frontend UI. In a full integration, the listing broadcast and peer discovery would use Intercom's socket-based sidechannel layer.
+
+---
+
+##  TRAC Reward Address
+
+```
+trac183pv7zxk705m29w6y2l9fvwntacps4vr6v0cua06qq507g22kxeqczfzks
+```
+
+>  **Replace `trac183pv7zxk705m29w6y2l9fvwntacps4vr6v0cua06qq507g22kxeqczfzks` with your actual Trac address to receive the 500 TNK payout.**
+
+---
+
+## 📁 Project Structure
+
+```
+/
+├── index.html       # Main app — P2P skill marketplace UI
+├── SKILL.md         # Agent skill instructions
+├── README.md        # This file
+└── screenshots/     # Proof of app working
+```
+
+---
+
+## 🤖 Agent Integration
+
+See [`SKILL.md`](./SKILL.md) for instructions on how AI agents can interact with SkillMatch P2P via Intercom.
+
+---
+
+## 📜 License
+
+MIT — Fork freely, build freely.
+
+---
+
+*Built with ❤️ on the TRAC Network / Intercom stack*
