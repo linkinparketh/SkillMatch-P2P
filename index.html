@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SkillMatch P2P — Decentralized Skill Marketplace</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a08;
+    --surface: #111110;
+    --surface2: #1a1a17;
+    --border: #2a2a25;
+    --accent: #c8f542;
+    --accent2: #f5a742;
+    --text: #e8e8df;
+    --muted: #6b6b60;
+    --danger: #f54242;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Syne', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: 
+      linear-gradient(rgba(200,245,66,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(200,245,66,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ─── HEADER ─── */
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(10,10,8,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+  }
+
+  .logo {
+    font-size: 1.1rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .logo-dot {
+    width: 8px; height: 8px;
+    background: var(--accent);
+    border-radius: 50%;
+    display: inline-block;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+
+  .header-badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--accent);
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    letter-spacing: 0.05em;
+  }
+
+  .header-nav {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .nav-btn {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: 'Syne', sans-serif;
+    font-size: 0.8rem;
+    padding: 0.3rem 0.8rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .nav-btn:hover, .nav-btn.active {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .nav-btn.primary {
+    background: var(--accent);
+    color: var(--bg);
+    border-color: var(--accent);
+    font-weight: 700;
+  }
+  .nav-btn.primary:hover {
+    background: #d4ff4e;
+    color: var(--bg);
+  }
+
+  /* ─── HERO ─── */
+  .hero {
+    position: relative;
+    z-index: 1;
+    padding: 5rem 2rem 3rem;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .hero-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .hero-tag::before {
+    content: '';
+    width: 20px; height: 1px;
+    background: var(--accent);
+  }
+
+  h1 {
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    margin-bottom: 1.5rem;
+  }
+
+  h1 span {
+    color: var(--accent);
+    position: relative;
+  }
+
+  h1 span::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0; right: 0;
+    height: 3px;
+    background: var(--accent);
+    opacity: 0.4;
+  }
+
+  .hero-desc {
+    color: var(--muted);
+    font-size: 1.05rem;
+    max-width: 520px;
+    line-height: 1.7;
+    margin-bottom: 2rem;
+  }
+
+  .hero-stats {
+    display: flex;
+    gap: 2rem;
+    font-family: 'DM Mono', monospace;
+  }
+
+  .stat {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
+  .stat-num {
+    font-size: 1.6rem;
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  .stat-label {
+    font-size: 0.7rem;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  /* ─── MAIN LAYOUT ─── */
+  .main {
+    position: relative;
+    z-index: 1;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 2rem 4rem;
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 1.5rem;
+  }
+
+  /* ─── SKILLS FEED ─── */
+  .feed-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+
+  .feed-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .filter-tabs {
+    display: flex;
+    gap: 0.25rem;
+  }
+
+  .filter-tab {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .filter-tab.active {
+    background: var(--accent);
+    color: var(--bg);
+    border-color: var(--accent);
+    font-weight: 500;
+  }
+
+  /* ─── SKILL CARD ─── */
+  .skill-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.25rem;
+    margin-bottom: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .skill-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px;
+    height: 100%;
+    background: var(--accent);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .skill-card:hover {
+    border-color: var(--accent);
+    transform: translateX(2px);
+  }
+
+  .skill-card:hover::before {
+    opacity: 1;
+  }
+
+  .card-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+  }
+
+  .card-avatar {
+    width: 38px; height: 38px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+  }
+
+  .card-meta {
+    flex: 1;
+    padding-left: 0.75rem;
+  }
+
+  .card-name {
+    font-weight: 700;
+    font-size: 0.9rem;
+    margin-bottom: 0.1rem;
+  }
+
+  .card-handle {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+  }
+
+  .card-type {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    padding: 0.15rem 0.5rem;
+    border-radius: 3px;
+    font-weight: 500;
+  }
+  .type-offer {
+    background: rgba(200,245,66,0.12);
+    color: var(--accent);
+    border: 1px solid rgba(200,245,66,0.3);
+  }
+  .type-seek {
+    background: rgba(245,167,66,0.12);
+    color: var(--accent2);
+    border: 1px solid rgba(245,167,66,0.3);
+  }
+
+  .card-title {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 0.4rem;
+    line-height: 1.3;
+  }
+
+  .card-desc {
+    font-size: 0.82rem;
+    color: var(--muted);
+    line-height: 1.6;
+    margin-bottom: 0.75rem;
+  }
+
+  .card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 0.15rem 0.5rem;
+    border-radius: 3px;
+  }
+
+  .card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .card-rate {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--text);
+  }
+
+  .card-rate span {
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  .contact-btn {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.3rem 0.8rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .contact-btn:hover {
+    background: var(--accent);
+    color: var(--bg);
+    border-color: var(--accent);
+  }
+
+  /* ─── SIDEBAR ─── */
+  .sidebar {}
+
+  .post-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+  }
+
+  .post-box h3 {
+    font-size: 0.85rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 1rem;
+    color: var(--accent);
+  }
+
+  .form-group {
+    margin-bottom: 0.75rem;
+  }
+
+  label {
+    display: block;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.3rem;
+  }
+
+  input, textarea, select {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.8rem;
+    padding: 0.5rem 0.7rem;
+    border-radius: 5px;
+    outline: none;
+    transition: border-color 0.15s;
+    resize: none;
+  }
+  input:focus, textarea:focus, select:focus {
+    border-color: var(--accent);
+  }
+  select option {
+    background: var(--surface2);
+  }
+
+  .type-toggle {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.4rem;
+  }
+
+  .type-toggle-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: 'Syne', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 700;
+    padding: 0.4rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: center;
+  }
+  .type-toggle-btn.selected-offer {
+    background: rgba(200,245,66,0.15);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .type-toggle-btn.selected-seek {
+    background: rgba(245,167,66,0.15);
+    border-color: var(--accent2);
+    color: var(--accent2);
+  }
+
+  .submit-btn {
+    width: 100%;
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    font-family: 'Syne', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 800;
+    padding: 0.65rem;
+    border-radius: 5px;
+    cursor: pointer;
+    letter-spacing: 0.02em;
+    transition: all 0.2s;
+    margin-top: 0.5rem;
+  }
+  .submit-btn:hover {
+    background: #d4ff4e;
+    transform: translateY(-1px);
+  }
+  .submit-btn:active {
+    transform: translateY(0);
+  }
+
+  /* Live feed indicator */
+  .live-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.25rem;
+  }
+
+  .live-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .live-dot {
+    width: 7px; height: 7px;
+    background: #42f54e;
+    border-radius: 50%;
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+
+  .live-title {
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #42f54e;
+  }
+
+  .activity-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+  .activity-item:last-child { border-bottom: none; }
+
+  .activity-icon {
+    font-size: 0.9rem;
+    flex-shrink: 0;
+    margin-top: 0.05rem;
+  }
+
+  .activity-text strong {
+    color: var(--text);
+  }
+
+  .activity-time {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    margin-left: auto;
+    color: var(--border);
+    flex-shrink: 0;
+  }
+
+  /* ─── MODAL ─── */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+  }
+  .modal-overlay.open {
+    display: flex;
+  }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 2rem;
+    max-width: 480px;
+    width: 100%;
+    position: relative;
+    animation: slideUp 0.25s ease-out;
+  }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .modal-close {
+    position: absolute;
+    top: 1rem; right: 1rem;
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    width: 28px; height: 28px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+  }
+  .modal-close:hover { border-color: var(--danger); color: var(--danger); }
+
+  .modal h2 {
+    font-size: 1.3rem;
+    font-weight: 800;
+    margin-bottom: 0.3rem;
+  }
+  .modal-sub {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--muted);
+    margin-bottom: 1.5rem;
+  }
+  .modal-field {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+  .modal-field-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.3rem;
+  }
+  .modal-field-value {
+    font-size: 0.9rem;
+    color: var(--text);
+  }
+  .p2p-info {
+    background: rgba(200,245,66,0.06);
+    border: 1px solid rgba(200,245,66,0.2);
+    border-radius: 5px;
+    padding: 0.75rem;
+    font-size: 0.78rem;
+    color: var(--accent);
+    margin-bottom: 1rem;
+    font-family: 'DM Mono', monospace;
+    line-height: 1.6;
+  }
+  .copy-btn {
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    font-family: 'Syne', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 800;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .copy-btn:hover { background: #d4ff4e; }
+
+  /* toast */
+  .toast {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--accent);
+    color: var(--bg);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.8rem;
+    font-weight: 500;
+    padding: 0.5rem 1.2rem;
+    border-radius: 5px;
+    opacity: 0;
+    transition: all 0.3s;
+    z-index: 300;
+    pointer-events: none;
+  }
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  @media (max-width: 700px) {
+    .main { grid-template-columns: 1fr; }
+    .sidebar { order: -1; }
+    h1 { font-size: 2rem; }
+    .hero { padding: 3rem 1rem 2rem; }
+    .main { padding: 0 1rem 3rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">
+    <span class="logo-dot"></span>
+    SkillMatch<span style="color:var(--accent)">P2P</span>
+  </div>
+  <div class="header-badge">Powered by Intercom · TRAC Network</div>
+  <div class="header-nav">
+    <button class="nav-btn active" onclick="filterAll()">All Skills</button>
+    <button class="nav-btn" onclick="filterType('offer')">Offers</button>
+    <button class="nav-btn" onclick="filterType('seek')">Seeking</button>
+  </div>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-tag">Decentralized · P2P · No Middleman</div>
+  <h1>Find Skills,<br><span>Trade Directly</span></h1>
+  <p class="hero-desc">
+    A peer-to-peer skill marketplace built on Intercom. Post what you offer or seek, connect directly — no platform fees, no intermediaries.
+  </p>
+  <div class="hero-stats">
+    <div class="stat">
+      <span class="stat-num" id="stat-listings">0</span>
+      <span class="stat-label">Listings</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num" id="stat-active">0</span>
+      <span class="stat-label">Active Peers</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num" id="stat-matches">0</span>
+      <span class="stat-label">Matches Today</span>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <!-- FEED -->
+  <div class="feed">
+    <div class="feed-header">
+      <span class="feed-title">Live Listings</span>
+      <div class="filter-tabs">
+        <button class="filter-tab active" onclick="setFilter('all', this)">All</button>
+        <button class="filter-tab" onclick="setFilter('dev', this)">Dev</button>
+        <button class="filter-tab" onclick="setFilter('design', this)">Design</button>
+        <button class="filter-tab" onclick="setFilter('writing', this)">Writing</button>
+        <button class="filter-tab" onclick="setFilter('marketing', this)">Marketing</button>
+      </div>
+    </div>
+    <div id="skill-feed"></div>
+  </div>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <!-- POST FORM -->
+    <div class="post-box">
+      <h3>Post a Listing</h3>
+
+      <div class="form-group">
+        <label>Type</label>
+        <div class="type-toggle">
+          <button class="type-toggle-btn selected-offer" id="btn-offer" onclick="selectType('offer')">🟢 I Offer</button>
+          <button class="type-toggle-btn" id="btn-seek" onclick="selectType('seek')">🟡 I Seek</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Your Name</label>
+        <input id="f-name" type="text" placeholder="satoshi.btc" />
+      </div>
+
+      <div class="form-group">
+        <label>Skill Title</label>
+        <input id="f-title" type="text" placeholder="e.g. Solidity Smart Contract Dev" />
+      </div>
+
+      <div class="form-group">
+        <label>Description</label>
+        <textarea id="f-desc" rows="3" placeholder="What exactly do you offer or need?"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Category</label>
+        <select id="f-cat">
+          <option value="dev">Development</option>
+          <option value="design">Design</option>
+          <option value="writing">Writing</option>
+          <option value="marketing">Marketing</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Tags (comma-separated)</label>
+        <input id="f-tags" type="text" placeholder="solidity, defi, rust" />
+      </div>
+
+      <div class="form-group">
+        <label>Rate (optional)</label>
+        <input id="f-rate" type="text" placeholder="e.g. 50 TNK/hr or open to barter" />
+      </div>
+
+      <div class="form-group">
+        <label>Contact / Trac Address</label>
+        <input id="f-contact" type="text" placeholder="trac1qxxx... or @handle" />
+      </div>
+
+      <button class="submit-btn" onclick="postListing()">📡 Broadcast P2P</button>
+    </div>
+
+    <!-- LIVE ACTIVITY -->
+    <div class="live-box">
+      <div class="live-header">
+        <div class="live-dot"></div>
+        <span class="live-title">Live Network</span>
+      </div>
+      <div id="activity-feed"></div>
+    </div>
+  </div>
+</div>
+
+<!-- CONTACT MODAL -->
+<div class="modal-overlay" id="modal" onclick="closeModal(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="document.getElementById('modal').classList.remove('open')">✕</button>
+    <h2 id="modal-name"></h2>
+    <p class="modal-sub" id="modal-handle"></p>
+    <div class="modal-field">
+      <div class="modal-field-label">Skill</div>
+      <div class="modal-field-value" id="modal-title"></div>
+    </div>
+    <div class="modal-field">
+      <div class="modal-field-label">Description</div>
+      <div class="modal-field-value" id="modal-desc"></div>
+    </div>
+    <div class="modal-field">
+      <div class="modal-field-label">Rate</div>
+      <div class="modal-field-value" id="modal-rate"></div>
+    </div>
+    <div class="p2p-info" id="modal-contact-info">
+      📡 P2P Contact via Intercom Sidechannel — address below
+    </div>
+    <button class="copy-btn" id="modal-copy-btn" onclick="copyContact()">Copy Contact Address</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── DATA ───
+let currentType = 'offer';
+let currentFilter = 'all';
+let listings = [];
+let activeContact = null;
+
+const EMOJIS = { dev: '⚙️', design: '🎨', writing: '✍️', marketing: '📣', other: '🔮' };
+const BG_COLORS = {
+  dev: 'rgba(100,180,255,0.15)',
+  design: 'rgba(200,100,255,0.15)',
+  writing: 'rgba(255,180,100,0.15)',
+  marketing: 'rgba(100,255,180,0.15)',
+  other: 'rgba(200,245,66,0.15)'
+};
+
+const SEED_DATA = [
+  {
+    id: 1, type: 'offer', name: 'devchain.eth', handle: 'trac1q8xr…4f2a',
+    title: 'Rust & WebAssembly Engineer', category: 'dev',
+    desc: 'I build high-performance Rust modules and WASM targets for dApps. 5+ years shipping production Rust. Can integrate with any frontend stack.',
+    tags: ['rust', 'wasm', 'dapp', 'substrate'],
+    rate: '80 TNK/hr', contact: 'trac1q8xr9pz7mnc4f2a'
+  },
+  {
+    id: 2, type: 'seek', name: 'priya.design', handle: 'trac1qw2k…8m3n',
+    title: 'Looking for: Web3 Frontend (React/Svelte)',
+    category: 'dev',
+    desc: 'Building a decentralized voting interface. Need someone who knows ethers.js or wagmi. 2-3 week gig, flexible rate.',
+    tags: ['react', 'svelte', 'wagmi', 'ethers'],
+    rate: '60–100 TNK/hr', contact: 'trac1qw2k5j9r8m3n'
+  },
+  {
+    id: 3, type: 'offer', name: 'inkpunk.studio', handle: 'trac1q5v…9c1z',
+    title: 'NFT & Brand Design for Web3 Projects', category: 'design',
+    desc: 'Award-winning illustrator specializing in generative NFT collections, brand identity, and UI/UX for crypto projects. Portfolio: inkpunk.xyz',
+    tags: ['nft', 'illustration', 'brand', 'ui/ux'],
+    rate: '50 TNK/hr or project rate', contact: 'trac1q5v8yh6k9c1z'
+  },
+  {
+    id: 4, type: 'offer', name: 'wordsmith.trac', handle: 'trac1q3p…7a8b',
+    title: 'Web3 Whitepaper & Technical Writing', category: 'writing',
+    desc: 'Technical writer with deep DeFi knowledge. I\'ve written 20+ whitepapers, tokenomics docs, and pitch decks for funded projects.',
+    tags: ['whitepaper', 'tokenomics', 'defi', 'docs'],
+    rate: '200 TNK/doc or 40 TNK/hr', contact: 'trac1q3p2n5m7a8b'
+  },
+  {
+    id: 5, type: 'seek', name: 'moonlabs.dev', handle: 'trac1q9j…2e5f',
+    title: 'Seeking: Smart Contract Auditor', category: 'dev',
+    desc: 'We have a DeFi lending protocol (~2k lines of Solidity) ready for audit. Looking for someone with Slither/Foundry experience. Bounty included.',
+    tags: ['audit', 'solidity', 'defi', 'security'],
+    rate: '500–1000 TNK flat', contact: 'trac1q9j4r7l2e5f'
+  },
+  {
+    id: 6, type: 'offer', name: 'growthguru.eth', handle: 'trac1q6d…3k9h',
+    title: 'DeFi Community Growth & Twitter Marketing', category: 'marketing',
+    desc: 'Grew 3 DeFi communities to 50k+ members. Twitter threads, ambassador programs, Discord management. Let\'s get your protocol noticed.',
+    tags: ['twitter', 'discord', 'community', 'kol'],
+    rate: '30 TNK/hr or retainer', contact: 'trac1q6d8s1n3k9h'
+  }
+];
+
+// ─── ACTIVITY LOG ───
+const ACTIVITIES = [
+  { icon: '🤝', text: '<strong>devchain.eth</strong> matched with <strong>moonlabs.dev</strong>', time: '2m' },
+  { icon: '📡', text: '<strong>inkpunk.studio</strong> posted a new listing', time: '5m' },
+  { icon: '💬', text: '<strong>priya.design</strong> contacted 3 peers', time: '12m' },
+  { icon: '✅', text: '<strong>wordsmith.trac</strong> completed a job', time: '18m' },
+  { icon: '🆕', text: '<strong>growthguru.eth</strong> joined the network', time: '31m' },
+];
+
+// ─── INIT ───
+function init() {
+  listings = [...SEED_DATA];
+  renderFeed();
+  renderActivity();
+  animateStats();
+}
+
+function animateStats() {
+  animateNum('stat-listings', 0, listings.length, 600);
+  animateNum('stat-active', 0, 47, 800);
+  animateNum('stat-matches', 0, 12, 700);
+}
+
+function animateNum(id, from, to, dur) {
+  const el = document.getElementById(id);
+  const step = (to - from) / (dur / 16);
+  let cur = from;
+  const interval = setInterval(() => {
+    cur += step;
+    if (cur >= to) { cur = to; clearInterval(interval); }
+    el.textContent = Math.floor(cur);
+  }, 16);
+}
+
+// ─── RENDER ───
+function renderFeed() {
+  const feed = document.getElementById('skill-feed');
+  let data = listings;
+  if (currentFilter !== 'all') data = data.filter(l => l.category === currentFilter);
+  
+  feed.innerHTML = data.length === 0 
+    ? `<div style="text-align:center;color:var(--muted);padding:3rem;font-family:'DM Mono',monospace;font-size:0.8rem">No listings in this category yet.<br>Be the first to post!</div>`
+    : data.map(l => cardHTML(l)).join('');
+
+  document.getElementById('stat-listings').textContent = listings.length;
+}
+
+function cardHTML(l) {
+  const tags = l.tags.map(t => `<span class="tag">${t}</span>`).join('');
+  return `
+    <div class="skill-card" onclick="openModal(${l.id})">
+      <div class="card-top">
+        <div class="card-avatar" style="background:${BG_COLORS[l.category]}">${EMOJIS[l.category]}</div>
+        <div class="card-meta">
+          <div class="card-name">${l.name}</div>
+          <div class="card-handle">${l.handle}</div>
+        </div>
+        <span class="card-type ${l.type === 'offer' ? 'type-offer' : 'type-seek'}">
+          ${l.type === 'offer' ? '▲ OFFER' : '▼ SEEKING'}
+        </span>
+      </div>
+      <div class="card-title">${l.title}</div>
+      <div class="card-desc">${l.desc}</div>
+      <div class="card-tags">${tags}</div>
+      <div class="card-footer">
+        <div class="card-rate">Rate: <span>${l.rate}</span></div>
+        <button class="contact-btn" onclick="event.stopPropagation();openModal(${l.id})">Contact P2P →</button>
+      </div>
+    </div>
+  `;
+}
+
+function renderActivity() {
+  const feed = document.getElementById('activity-feed');
+  feed.innerHTML = ACTIVITIES.map(a => `
+    <div class="activity-item">
+      <span class="activity-icon">${a.icon}</span>
+      <span class="activity-text">${a.text}</span>
+      <span class="activity-time">${a.time}</span>
+    </div>
+  `).join('');
+}
+
+// ─── FILTERS ───
+function setFilter(cat, btn) {
+  currentFilter = cat;
+  document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderFeed();
+}
+
+function filterAll() { currentFilter = 'all'; renderFeed(); }
+function filterType(t) { /* stub for header nav */ }
+
+// ─── TYPE SELECT ───
+function selectType(t) {
+  currentType = t;
+  document.getElementById('btn-offer').className = 'type-toggle-btn' + (t === 'offer' ? ' selected-offer' : '');
+  document.getElementById('btn-seek').className = 'type-toggle-btn' + (t === 'seek' ? ' selected-seek' : '');
+}
+
+// ─── POST LISTING ───
+function postListing() {
+  const name = document.getElementById('f-name').value.trim();
+  const title = document.getElementById('f-title').value.trim();
+  const desc = document.getElementById('f-desc').value.trim();
+  const cat = document.getElementById('f-cat').value;
+  const tagsRaw = document.getElementById('f-tags').value;
+  const rate = document.getElementById('f-rate').value.trim() || 'Open to discuss';
+  const contact = document.getElementById('f-contact').value.trim();
+
+  if (!name || !title || !desc) {
+    showToast('⚠️ Please fill name, title, and description');
+    return;
+  }
+
+  const tags = tagsRaw.split(',').map(t => t.trim()).filter(Boolean);
+  const id = Date.now();
+  const handle = contact || 'p2p-channel-' + Math.random().toString(36).substr(2,6);
+
+  listings.unshift({ id, type: currentType, name, handle, title, category: cat, desc, tags, rate, contact: handle });
+
+  // Clear form
+  ['f-name','f-title','f-desc','f-tags','f-rate','f-contact'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+
+  renderFeed();
+  animateNum('stat-listings', listings.length - 1, listings.length, 300);
+
+  // Add to activity
+  ACTIVITIES.unshift({ icon: '📡', text: `<strong>${name}</strong> posted: ${title}`, time: 'now' });
+  if (ACTIVITIES.length > 6) ACTIVITIES.pop();
+  renderActivity();
+
+  showToast('✅ Listing broadcast to P2P network!');
+}
+
+// ─── MODAL ───
+function openModal(id) {
+  const l = listings.find(x => x.id === id);
+  if (!l) return;
+  activeContact = l.contact;
+
+  document.getElementById('modal-name').textContent = l.name;
+  document.getElementById('modal-handle').textContent = l.handle;
+  document.getElementById('modal-title').textContent = l.title;
+  document.getElementById('modal-desc').textContent = l.desc;
+  document.getElementById('modal-rate').textContent = l.rate;
+  document.getElementById('modal-contact-info').textContent = '📡 P2P contact via Intercom sidechannel: ' + l.contact;
+  document.getElementById('modal').classList.add('open');
+}
+
+function closeModal(e) {
+  if (e.target === document.getElementById('modal')) {
+    document.getElementById('modal').classList.remove('open');
+  }
+}
+
+function copyContact() {
+  if (!activeContact) return;
+  navigator.clipboard.writeText(activeContact).then(() => {
+    showToast('📋 Contact address copied!');
+  }).catch(() => {
+    showToast('Contact: ' + activeContact);
+  });
+}
+
+// ─── TOAST ───
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ─── START ───
+init();
+</script>
+</body>
+</html>
